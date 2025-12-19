@@ -1,0 +1,37 @@
+{
+  "name": "e-commerce-store",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000E\u0000-\u0000C\u0000o\u0000m\u0000m\u0000e\u0000r\u0000c\u0000e\u0000-\u0000S\u0000t\u0000o\u0000r\u0000e\u0000\r\u0000 \u0000",
+  "main": "backend/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon backend/server.js",
+    "start": "node backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guptaditya123/E-Commerce-Store.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/guptaditya123/E-Commerce-Store/issues"
+  },
+  "homepage": "https://github.com/guptaditya123/E-Commerce-Store#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "ioredis": "^5.8.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.1",
+    "stripe": "^20.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
