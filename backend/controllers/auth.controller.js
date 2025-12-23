@@ -21,15 +21,15 @@ const setCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true, // prevent XSS attack , cross-site scripting attack
     secure: process.env.NODE_ENV === "production",
-    samesite: "strict", //prevent csrf attack, cross-site request forgery
+    sameSite: "strict", //prevent csrf attack, cross-site request forgery
     maxAge: 15 * 60 * 1000, // 15min
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true, // prevent XSS attack , cross-site scripting attack
     secure: process.env.NODE_ENV === "production",
-    samesite: "strict", //prevent csrf attack, cross-site request forgery
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 15min
+    sameSite: "strict", //prevent csrf attack, cross-site request forgery
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
   });
 };
 
@@ -49,13 +49,10 @@ export const signup = async (req, res) => {
     setCookies(res, accessToken, refreshToken);
 
     res.status(201).json({
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      message: "User created successfully",
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
     });
   } catch (error) {
     res.status(500).json(error.message);
@@ -63,19 +60,74 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.send("login route is called");
+  try {
+    console.log("api hitted");
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (user && (await user.comparePassword(password))) {
+      console.log("loggin in");
+      const { accessToken, refreshToken } = generateToken(user._id);
+      await storeRefreshToken(user._id, refreshToken);
+      setCookies(res, accessToken, refreshToken);
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
+    } else {
+      res.status(401).json("invalid email and password");
+    }
+  } catch (err) {
+    res.status(500).json({ message: `Internal server error,${err}` });
+  }
 };
 
 export const logout = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
-    await redis.delete(`refresh_token:,${decoded.userId}`);
+    await redis.delete(`refresh_token:,${decoded.id}`);
 
     res.clearCookie("refreshToken");
     res.clearCookie("accessToken");
     res.json({ message: "logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// this is to refresh the access token
+export const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "No refresh token provided" });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
+    const storedToken = await redis.get(`refresh_token:${decoded.id}`);
+
+    if (storedToken !== refreshToken) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    const accessToken = jwt.sign(
+      { userId: decoded.id },
+      process.env.ACCESS_TOKEN_KEY,
+      { expiresIn: "15m" }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.json({ message: "Token Refreshed Successfully." });
+  } catch (err) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
