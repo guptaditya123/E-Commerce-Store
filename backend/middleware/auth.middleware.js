@@ -22,3 +22,18 @@ export const protectRoute = async(req,res)=>{
         return res.status(401).json({message:"Unauthorized - Invalid access Token"})
     }
 }
+
+
+
+// admin route
+export const adminRoute = async(req,res)=>{
+    try {
+        if(req.user && req.user === "admin"){
+            next();
+        }else{
+            return res.status(401).json({message:"Access denied - Admin only"})
+        }
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+}
