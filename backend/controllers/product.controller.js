@@ -80,3 +80,92 @@ export const deleteProduct = async (req,res)=>{
         res.status(500).json({message:"Server error",error:error.message})
     }
 }
+
+
+export const getRecommendedProduct = async (req,res)=>{
+    try {
+        const products = await Product.aggregate([
+           { $sample:{size:3},},
+           {
+            $project:{
+                _id:1,
+                name:1,
+                description:1,
+                image:1,
+                price:1,
+            },
+           },
+        ])
+        res.json(products);
+    } catch (error) {
+        console.log("Error in getRecommendedProduct controller",error.message);
+        res.status(500).json(error)
+    }
+}
+
+// this api return more related recommendations
+// export const getRecommendedProduct = async (req, res) => {
+//   try {
+//     const { category, productId } = req.query;
+
+//     const products = await Product.aggregate([
+//       {
+//         $match: {
+//           category,
+//           _id: { $ne: new mongoose.Types.ObjectId(productId) },
+//         },
+//       },
+//       { $sample: { size: 3 } },
+//       {
+//         $project: {
+//           name: 1,
+//           image: 1,
+//           price: 1,
+//         },
+//       },
+//     ]);
+
+//     res.json(products);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to load recommendations" });
+//   }
+// };
+
+
+export const getProductByCategory=async(req,res)=>{
+    try {
+        const {category} =req.params;
+        const products = await Product.find({category});
+        res.json(products)
+    } catch (error) {
+        console.log("Error in getProductByCategory controller",error.message);
+        res.status(500).json({message:"Server error",error:error.message})
+    }
+}
+
+export const toggleFeaturedProduct = async(req,res)=>{
+    try {
+        const {product} = await Product.findById(req.params.id);
+        if(product){
+            product.isFeatured = !product.isFeatured;
+            const updatedProduct = await product.save();
+            await updateFeaturedProductsCache();
+            res.json(updatedProduct);
+        }else{
+            res.status(404).json({message:"Product not found"})
+        }
+    } catch (error) {
+        console.log("Error in toggleFeaturedProduct controller",error.message);
+        res.status(500).json({message:"Server error",error:error.message});
+    }
+}
+
+async function updateFeaturedProductsCache() {
+    try {
+        const featuredProducts = await Product.find({isFeatured:true}).lean();
+        await redis.set("featured_products",JSON.stringify(featuredProducts));
+    } catch (error) {
+        console.log("Error in updating featured products cache",error.message);
+        res.status(500).json({message:"Server error",error:error.message});
+    }
+}
