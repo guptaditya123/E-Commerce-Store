@@ -1,5 +1,5 @@
 
-import stripe from "../lib/stripe.js";
+import {stripe} from "../lib/stripe.js";
 import coupon from "../models/coupon.model.js";
 
 
