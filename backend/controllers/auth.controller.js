@@ -131,3 +131,13 @@ export const refreshToken = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+export const getProfile = async (req, res) => {
+  try {
+    res.json(req.user);
+  }
+  catch (err) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
