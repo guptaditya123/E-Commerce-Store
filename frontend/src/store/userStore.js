@@ -21,6 +21,19 @@ export const userStore=create((set,get)=>({
             set({loading:false});
             toast.error(error.response.data.message || "An error occurred")
         }
-    }
+    },git
+
+    login: async (email, password) => {
+		set({ loading: true });
+
+		try {
+			const res = await axios.post("/auth/login", { email, password });
+
+			set({ user: res.data, loading: false });
+		} catch (error) {
+			set({ loading: false });
+			toast.error(error.response.data.message || "An error occurred");
+		}
+	},
 
 }))
