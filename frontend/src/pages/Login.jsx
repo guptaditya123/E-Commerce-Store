@@ -2,20 +2,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { LogIn, Mail, Lock, ArrowRight, Loader } from "lucide-react";
-// import { useUserStore } from "../stores/useUserStore";
+
+import { userStore } from "../store/userStore";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-  const loading=false
 
-	// const { login, loading } = useUserStore();
+	const { login, loading } = userStore();
 
-	// const handleSubmit = (e) => {
-	// 	e.preventDefault();
-	// 	console.log(email, password);
-	// 	login(email, password);
-	// };
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		console.log(email, password);
+		login(email, password);
+	};
 
 	return (
 		<div className='flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
@@ -35,7 +35,7 @@ const Login = () => {
 				transition={{ duration: 0.8, delay: 0.2 }}
 			>
 				<div className='bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-					<form onSubmit={''} className='space-y-6'>
+					<form onSubmit={handleSubmit} className='space-y-6'>
 						<div>
 							<label htmlFor='email' className='block text-sm font-medium text-gray-300'>
 								Email address
