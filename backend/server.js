@@ -8,6 +8,7 @@ import paymentRoutes from './routes/payment.route.js'
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import couponRoutes from "./routes/coupon.route.js";
+import cors from 'cors'
 
 
 dotenv.config();
@@ -16,6 +17,10 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json()); // use to parse user sending data into json
 app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173', // frontend URL
+  credentials: true, // to allow cookies to be sent
+}));
 
 // Routing
 app.use("/api/auth", authRoutes);
