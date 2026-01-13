@@ -13,8 +13,8 @@ const SignUp = () => {
   });
   const { signup } = userStore();
   function handleSubmit(e) {
-	e.preventdefault();
-	signup();
+    e.preventDefault();
+    signup(formData);
   }
   const loading = false;
 
