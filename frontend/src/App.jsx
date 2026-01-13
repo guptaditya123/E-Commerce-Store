@@ -1,13 +1,16 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import SignUp from "./pages/SignUp"
 import Navbar from "./components/Navbar"
 import HomePage from "./pages/HomePage"
 import Login from "./pages/Login"
 import { Toaster } from "react-hot-toast"
+import { userStore } from "./store/userStore"
 
 
 
 function App() {
+
+  const {user } = userStore();
 
   return (
     <div className='min-h-screen bg-gray-900 text-white relative overflow-hidden'>
@@ -22,8 +25,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route  path="/" element={<HomePage />} />
-        <Route  path="/signup" element={<SignUp />} />
-        <Route  path="/login" element={<Login />} />
+        <Route  path="/signup" element={!user? <SignUp />:<Navigate to="/" />} />
+        <Route  path="/login" element={!user? <Login />:<Navigate to="/" />} />
       </Routes>
       </div>
       <Toaster />
