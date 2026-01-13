@@ -19,7 +19,7 @@ export const userStore=create((set,get)=>({
             set({user:res.data,loading:false});
         } catch (error) {
             set({loading:false});
-            toast.error(error.response.data.message || "An error occurred")
+            toast.error(error.response?.data?.message || "An error occurred")
         }
     },
 
@@ -32,8 +32,17 @@ export const userStore=create((set,get)=>({
 			set({ user: res.data, loading: false });
 		} catch (error) {
 			set({ loading: false });
-			toast.error(error.response.data.message || "An error occurred");
+			toast.error(error.response?.data?.message || "An error occurred");
 		}
 	},
+
+    logout: async() =>{
+        try {
+            const res = await axios.post('/auth/logout');
+            await set({user:null});
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occured during logout")
+        }
+    }
 
 }))
