@@ -5,13 +5,20 @@ import HomePage from "./pages/HomePage"
 import Login from "./pages/Login"
 import { Toaster } from "react-hot-toast"
 import { userStore } from "./store/userStore"
+import { useEffect } from "react"
+import LoadingSpinner from "./components/LoadingSpinner"
 
 
 
 function App() {
 
-  const {user } = userStore();
+  const {user , logout , checkAuth , checkingAuth} = userStore();
 
+  useEffect (()=>{
+    checkAuth();
+  },[checkAuth])
+
+  if(checkingAuth) return <LoadingSpinner />
   return (
     <div className='min-h-screen bg-gray-900 text-white relative overflow-hidden'>
       {/* Background gradient */}
