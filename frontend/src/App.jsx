@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast"
 import { userStore } from "./store/userStore"
 import { useEffect } from "react"
 import LoadingSpinner from "./components/LoadingSpinner"
+import AdminPage from "./pages/AdminPage"
 
 
 
@@ -34,6 +35,8 @@ function App() {
         <Route  path="/" element={<HomePage />} />
         <Route  path="/signup" element={!user? <SignUp />:<Navigate to="/" />} />
         <Route  path="/login" element={!user? <Login />:<Navigate to="/" />} />
+        <Route  path='/secret-dashboard' element={user.role ==='admin' ? <AdminPage /> : <Navigate to = '/login'/>} />
+
       </Routes>
       </div>
       <Toaster />
