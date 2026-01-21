@@ -35,8 +35,9 @@ function App() {
         <Route  path="/" element={<HomePage />} />
         <Route  path="/signup" element={!user? <SignUp />:<Navigate to="/" />} />
         <Route  path="/login" element={!user? <Login />:<Navigate to="/" />} />
-        <Route  path='/secret-dashboard' element={user.role ==='admin' ? <AdminPage /> : <Navigate to = '/login'/>} />
-
+        {/* <Route  path='/secret-dashboard' element={user.role ==='admin' ? <AdminPage /> : <Navigate to = '/login'/>} /> */}
+        <Route  path='/secret-dashboard' element={<AdminPage /> }/>
+                  
       </Routes>
       </div>
       <Toaster />
