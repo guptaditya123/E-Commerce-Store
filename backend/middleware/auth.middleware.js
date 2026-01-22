@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import User from '../models/user.model.js'
-export const protectRoute = async(req,res)=>{
+export const protectRoute = async(req,res,next)=>{
     try {
         const accessToken = req.cookies.accessToken;
         if(!accessToken){
@@ -17,6 +17,7 @@ export const protectRoute = async(req,res)=>{
         req.user = user;
         next();
 
+
     } catch (error) {
         console.log("Error in protectedRoute middleware",error.message);
         return res.status(401).json({message:"Unauthorized - Invalid access Token"})
@@ -26,9 +27,9 @@ export const protectRoute = async(req,res)=>{
 
 
 // admin route
-export const adminRoute = async(req,res)=>{
+export const adminRoute = async(req,res,next)=>{
     try {
-        if(req.user && req.user === "admin"){
+        if(req.user && req.user.role === "admin"){
             next();
         }else{
             return res.status(401).json({message:"Access denied - Admin only"})
