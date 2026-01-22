@@ -8,7 +8,7 @@ productRouter.get('/',protectRoute,adminRoute,getAllProducts);
 productRouter.get('/featuredProducts',getFeaturedProducts);
 productRouter.post('/recommendations',getRecommendedProduct);
 productRouter.post('/category/:category',getProductByCategory)
-productRouter.post('/createProduct',protectRoute,adminRoute,createProduct);
+productRouter.post('/',protectRoute,adminRoute,createProduct);
 productRouter.delete('/deleteProduct/:id',protectRoute,adminRoute,deleteProduct);
 productRouter.patch('/:id',protectRoute,adminRoute,toggleFeaturedProduct)
 
