@@ -1,9 +1,26 @@
 import React from 'react'
 import {motion} from 'framer-motion'
+import { Star, Trash } from 'lucide-react'
 
 const ProductList = () => {
 
-  
+  const products = [
+    {
+      _id:'1',
+      name:'Sample Product 1',
+      price:29.99,
+      category:'Category A',
+      featured:true
+    },
+    {
+      _id:'2',
+      name:'Sample Product 2',
+      price:19.99,
+      category:'Category B',
+      featured:false
+    }
+  ]
+    
 
   return (
     <motion.div
@@ -42,7 +59,37 @@ const ProductList = () => {
           </tr>
         </thead>
         <tbody className='bg-gray-800 divide-y divide-gray-700'>
-
+          {products.map((product) => (
+            <tr key={product._id} className='hover:bg-gray-700'>
+              <td className='px-6 py-4 whitespace-nowrap '>
+                {product.name}
+              </td>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+                ${product.price.toFixed(2)}
+              </td>
+              <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
+                {product.category}
+              </td>
+             			<td className='px-6 py-4 whitespace-nowrap'>
+								<button
+									onClick={() => toggleFeaturedProduct(product._id)}
+									className={`p-1 rounded-full ${
+										product.featured ? "bg-yellow-400 text-gray-900" : "bg-gray-600 text-gray-300"
+									} hover:bg-yellow-500 transition-colors duration-200`}
+								>
+									<Star className='h-5 w-5' />
+								</button>
+							</td>
+              <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
+								<button
+									onClick={() => deleteProduct(product._id)}
+									className='text-red-400 hover:text-red-300'
+								>
+									<Trash className='h-5 w-5' />
+								</button>
+							</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </motion.div>
