@@ -61,11 +61,11 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    console.log("api hitted");
+    console.log("api called");
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
-      console.log("loggin in");
+      console.log("logging in");
       const { accessToken, refreshToken } = generateToken(user._id);
       await storeRefreshToken(user._id, refreshToken);
       setCookies(res, accessToken, refreshToken);
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
         role: user.role,
       });
     } else {
-      res.status(401).json("invalid email and password");
+      res.status(401).json("Invalid email or password");
     }
   } catch (err) {
     res.status(500).json({ message: `Internal server error,${err}` });
@@ -85,9 +85,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
+    console.log("logging out");
     const refreshToken = req.cookies.refreshToken;
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
-    await redis.delete(`refresh_token:,${decoded.id}`);
+    console.log(decoded);
+    await redis.del(`refresh_token:${decoded.id}`);
 
     res.clearCookie("refreshToken");
     res.clearCookie("accessToken");
