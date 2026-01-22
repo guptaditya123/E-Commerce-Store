@@ -1,6 +1,7 @@
-import axios from "axios";
+
 import { create } from "zustand";
 import toast from "react-hot-toast";
+import axios from "../lib/axios";
 
 export const productStore = create((set)=>({
     products:[],
@@ -10,7 +11,7 @@ export const productStore = create((set)=>({
     createProduct: async(productData)=>{
         set({loading:true});
         try {
-            const res = await axios.post("/products",productData);
+            const res = await axios.post("/product/",productData);
             set((prevData)=>({
                 products:[...prevData.products,res.data],
                 loading:false,
