@@ -15,7 +15,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json()); // use to parse user sending data into json
+app.use(express.json({ limit: '10mb' })); // use to parse user sending data into json
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // parse URL-encoded data
 app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:5173', // frontend URL
