@@ -1,27 +1,22 @@
 import React from 'react'
 import {motion} from 'framer-motion'
 import { Star, Trash } from 'lucide-react'
-
+import { productStore } from '../store/productStore';
+import { useEffect } from 'react';
 const ProductList = () => {
+    const {products,deleteProduct,toggleFeaturedProduct,loading,fetchAllProducts} = productStore();
 
-  const products = [
-    {
-      _id:'1',
-      name:'Sample Product 1',
-      price:29.99,
-      category:'Category A',
-      featured:true
-    },
-    {
-      _id:'2',
-      name:'Sample Product 2',
-      price:19.99,
-      category:'Category B',
-      featured:false
-    }
-  ]
-    
+  useEffect(() => {
+    fetchAllProducts();
+  }, []);
 
+  if (loading) {
+    return (
+      <div className='flex justify-center items-center h-screen'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900'></div>
+      </div>
+    );
+  }
   return (
     <motion.div
     className='bg-gray-800 shadow-lg rounded-lg overflow-hidden max-w-4xl mx-auto'
@@ -61,7 +56,8 @@ const ProductList = () => {
         <tbody className='bg-gray-800 divide-y divide-gray-700'>
           {products.map((product) => (
             <tr key={product._id} className='hover:bg-gray-700'>
-              <td className='px-6 py-4 whitespace-nowrap '>
+              <td className='px-6 py-4 whitespace-nowrap flex items-center gap-3'>
+                <img src={product.image} alt={product.name} className='w-12 h-12 rounded-full' />
                 {product.name}
               </td>
               <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
