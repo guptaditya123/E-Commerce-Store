@@ -24,7 +24,7 @@ export const productStore = create((set)=>({
     fetchAllProducts: async()=>{
         set({loading:true})
         try {
-            const response = await axios.get('/products');
+            const response = await axios.get('/product');
             set({products:response.data.products,loading:false});
         } catch (error) {
             set({ error: "Failed to fetch products", loading: false });
@@ -35,7 +35,7 @@ export const productStore = create((set)=>({
     fetchProductsByCategory:async (category)=>{
         set({loading:true})
         try {
-            const response = await response.get(`/products/category/${category}`);
+            const response = await axios.get(`/product/category/${category}`);
             set({products:response.data.products,loading:false});
         } catch (error) {
             set({error:"Failed to fetch products",loading:false});
