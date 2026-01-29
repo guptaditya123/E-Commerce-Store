@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import AdminPage from "./pages/AdminPage";
 import CategoryPage from "./pages/CategoryPage";
+import CartPage from "./pages/CartPage";
 
 function App() {
   const { user, logout, checkAuth, checkingAuth } = userStore();
@@ -52,6 +53,7 @@ function App() {
               <CategoryPage />
             }
           />
+          <Route path='/cart' element={!user ? <Login /> :<CartPage />} />
         </Routes>
       </div>
       <Toaster />
