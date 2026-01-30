@@ -12,7 +12,7 @@ export const cartStore = create((set, get) => ({
   getCartItems: async () => {
     try {
       const response = await axios.get("/cart");
-      set({ coupon: response.data });
+      set({ cart: response.data});
     } catch (error) {
       console.error("Error fetching coupon:", error);
     }
@@ -40,6 +40,24 @@ export const cartStore = create((set, get) => ({
     } catch (error) {
       toast.error(error.response.data.message || "An error occurred");
     }
+  },
+
+  updateQuantity:async(productId,quantity)=>{
+    if(quantity === 0){
+      get().removeFromCart(productId)
+      return;
+    }
+    await axios.put(`/cart/update/${productId}`,{quantity})
+    set((prevState)=>({
+      cart:prevState.cart.map((item)=>(item._id === productId ? {...item,quantity}:item))
+    }))
+    get().calculateTotals
+  },
+
+  removeFromCart:async(productId)=>{
+    await axios.delete(`/cart/remove/`,{data:{productId}});
+    set((prevState)=>({cart:prevState.cart.filter((item)=>item._id !== productId)}))
+    get().calculateTotals()
   },
 
   calculateTotals: () => {
