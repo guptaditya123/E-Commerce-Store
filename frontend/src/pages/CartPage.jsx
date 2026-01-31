@@ -3,6 +3,7 @@ import {cartStore} from '../store/cartStore'
 import {motion} from 'framer-motion'
 import { useEffect } from 'react'
 import CartItem from '../components/CartItem'
+import { Link, ShoppingCart } from 'lucide-react'
 
 const CartPage = () => {
     const {cart,getCartItems} = cartStore();
@@ -23,7 +24,7 @@ const CartPage = () => {
                 transition={{ duration:0.5,delay:0.2}}
                 >
                     {cart?.length === 0?(
-                        <h2 className='text-2xl font-semibold text-gray-300 text-center col-span-full'>Your cart is empty</h2>
+                        <EmptyCartUI />
                     ):(
                         <div className='space-y-6'>
                             {cart?.map((item)=>(
@@ -38,7 +39,8 @@ const CartPage = () => {
                     initial={{opacity:0,x:20}}
                     animate={{duration:0.5 , delay:0.4}}
                     >
-
+                        <OrderSummary />
+                        <GiftCouponCart />
                     </motion.div>
                 )}
             </div>
@@ -49,3 +51,23 @@ const CartPage = () => {
 }
 
 export default CartPage
+
+
+const EmptyCartUI=()=>{
+    <motion.div
+    className='flex flex-col items-center justify-center space-y-4 py-16'
+    initial={{opacity:0,y:20}}
+    animate={{opacity:1,y:0}}
+    transition={{duration:0.5}}
+    >
+        <ShoppingCart className='h-24 w-24 text-gray-300' />
+        <h3>Your cart is empty</h3>
+        <p>Looks like you {"haven't"} added anything to your cart</p>
+        <Link className='mt-4 rounded-md bg-emerald-500 px-6 py-2 text-white  transition-colors hover:bg-emerald-600'
+        to='/'
+        >
+         Start Shopping
+        </Link>
+
+    </motion.div>
+}
