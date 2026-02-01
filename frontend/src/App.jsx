@@ -1,15 +1,17 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import SignUp from "./pages/SignUp";
 import Navbar from "./components/Navbar";
-import HomePage from "./pages/HomePage";
-import Login from "./pages/Login";
 import { Toaster } from "react-hot-toast";
 import { userStore } from "./store/userStore";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
-import AdminPage from "./pages/AdminPage";
-import CategoryPage from "./pages/CategoryPage";
-import CartPage from "./pages/CartPage";
+
+// Lazy load page components
+const SignUp = lazy(() => import("./pages/SignUp"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const Login = lazy(() => import("./pages/Login"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const CartPage = lazy(() => import("./pages/CartPage"));
 
 function App() {
   const { user, logout, checkAuth, checkingAuth } = userStore();
@@ -30,31 +32,33 @@ function App() {
       </div>
       <div className="relative z-50 pt-20 ">
         <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route
-            path="/signup"
-            element={!user ? <SignUp /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/login"
-            element={!user ? <Login /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/secret-dashboard"
-            element={
-              user?.role === "admin" ? <AdminPage /> : <Navigate to="/login" />
-            }
-          />
-          {/* <Route  path='/secret-dashboard' element={<AdminPage /> }/> */}
-          <Route
-            path="/category/:category"
-            element={
-              <CategoryPage />
-            }
-          />
-          <Route path='/cart' element={!user ? <Login /> :<CartPage />} />
-        </Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/signup"
+              element={!user ? <SignUp /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/login"
+              element={!user ? <Login /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/secret-dashboard"
+              element={
+                user?.role === "admin" ? <AdminPage /> : <Navigate to="/login" />
+              }
+            />
+            {/* <Route  path='/secret-dashboard' element={<AdminPage /> }/> */}
+            <Route
+              path="/category/:category"
+              element={
+                <CategoryPage />
+              }
+            />
+            <Route path='/cart' element={!user ? <Login /> :<CartPage />} />
+          </Routes>
+        </Suspense>
       </div>
       <Toaster />
     </div>
