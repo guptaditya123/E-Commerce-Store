@@ -32,8 +32,9 @@ export const cartStore = create((set, get) => ({
 
   getCartItems: async () => {
     try {
-      const response = await axios.get("/cart");
+      const response = await axios.get("/cart/");
       set({ cart: response.data});
+      get().calculateTotals();
     } catch (error) {
       console.error("Error fetching coupon:", error);
     }
@@ -68,10 +69,8 @@ export const cartStore = create((set, get) => ({
       get().removeFromCart(productId)
       return;
     }
-    await axios.put(`/cart/update/${productId}`,{quantity})
-    set((prevState)=>({
-      cart:prevState.cart.map((item)=>(item._id === productId ? {...item,quantity}:item))
-    }))
+    const response = await axios.put(`/cart/update/${productId}`,{quantity})
+    set({cart: response.data})
     get().calculateTotals()
   },
 
@@ -87,7 +86,9 @@ export const cartStore = create((set, get) => ({
   calculateTotals: () => {
     const { cart, coupon } = get();
     const subtotal = cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => {
+        return sum + item.price * item.quantity;
+      },
       0,
     );
     let total = subtotal;
