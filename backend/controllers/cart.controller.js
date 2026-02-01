@@ -50,11 +50,27 @@ export const updateQuantity = async(req,res)=>{
         if(quantity === 0){
             user.cartItems = user.cartItems.filter((item)=>item.product.toString() !== productId);
             await user.save();
-            return res.json(user.cartItems);
+            
+            // Return full cart data with product details
+            const productIds = user.cartItems.map(item => item.product);
+            const products = await Product.find({_id:{$in:productIds}});
+            const cartItems = products.map((product)=>{
+                const cartItem = user.cartItems.find(item => item.product.toString() === product._id.toString());
+                return {...product.toJSON(),quantity:cartItem.quantity}
+            })
+            return res.json(cartItems);
         }
         item.quantity = quantity;
         await user.save();
-        res.json(user.cartItems);
+        
+        // Return full cart data with product details
+        const productIds = user.cartItems.map(item => item.product);
+        const products = await Product.find({_id:{$in:productIds}});
+        const cartItems = products.map((product)=>{
+            const cartItem = user.cartItems.find(item => item.product.toString() === product._id.toString());
+            return {...product.toJSON(),quantity:cartItem.quantity}
+        })
+        res.json(cartItems);
     }else{
         res.status(404).json({message:"Product not found"});
     }
