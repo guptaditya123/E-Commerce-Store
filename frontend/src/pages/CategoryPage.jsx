@@ -3,14 +3,18 @@ import { productStore } from "../store/productStore";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const CategoryPage = () => {
-  const { fetchProductsByCategory, products } = productStore();
+  const { fetchProductsByCategory, products,loading } = productStore();
 
   const { category } = useParams();
   useEffect(() => {
     fetchProductsByCategory(category);
   }, [fetchProductsByCategory, category]);
+   if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <div className="min-h-screen">
       <div className="relative z-10 max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-16">
