@@ -74,7 +74,7 @@ export const productStore = create((set)=>({
     fetchFeaturedProducts: async()=>{
         set({loading:true})
         try {
-            const response = await axios.get("/products/featured")
+            const response = await axios.get("/product/featuredProducts")
             set({products:response.data,loading:false})
         } catch (error) {
             
