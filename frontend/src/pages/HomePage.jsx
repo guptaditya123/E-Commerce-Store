@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import CategoryItem from "../components/CategoryItem";
 import { productStore } from "../store/productStore";
 import FeaturedProducts from "../components/FeaturedProducts";
+import PurchaseCancelPage from "./PurchaseCancelPage";
+import PurchaseSuccessPage from "./PurchaseSuccessPage";
 
 const categories = [
   { href: "jeans", name: "Jeans", imageUrl: "/jeans.jpg" },
@@ -14,6 +16,7 @@ const categories = [
 ];
 const HomePage = () => {
   const { fetchFeaturedProducts, products, isLoading } = productStore();
+  console.log(products)
   useEffect(() => {
     fetchFeaturedProducts();
   }, [fetchFeaturedProducts]);
@@ -36,6 +39,8 @@ const HomePage = () => {
           <FeaturedProducts featuredProducts={products} />
         )}
       </div>
+      <PurchaseCancelPage />
+      <PurchaseSuccessPage />
     </div>
   );
 };
