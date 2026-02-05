@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import toast from 'react-hot-toast';
 import axios from '../lib/axios'
 import ProductCard from '../components/ProductCard'
 import LoadingSpinner from '../components/LoadingSpinner'
+
 
 const PeopleBought = () => {
     const [recommendations,setRecommendations]= useState([]);
@@ -12,7 +13,7 @@ const PeopleBought = () => {
     useEffect(()=>{
         const fetchRecommendations = async()=>{
             try {
-                const res = await axios.get('/products/recommendations');
+                const res = await axios.post('/product/recommendations');
                 setRecommendations(res.data);
             } catch (error) {
                 toast.error(error.response.data.message || "An error occurred while fetching recommendations")
