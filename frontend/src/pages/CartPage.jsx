@@ -7,6 +7,7 @@ import { ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import OrderSummary from '../components/OrderSummary'
 import GiftCouponCart from '../components/GiftCouponCard'
+import PeopleBought from '../components/PeopleBought'
 
 
 
@@ -37,6 +38,7 @@ const CartPage = () => {
                             ))}
                         </div>
                     )}
+                    {cart.length > 0 && <PeopleBought />}
                 </motion.div>
                 {cart?.length > 0 && (
                     <motion.div
