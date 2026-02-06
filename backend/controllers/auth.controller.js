@@ -1,6 +1,8 @@
+import logger from "../lib/logger.js";
 import redis  from "../lib/redis.js";
 import User from "../models/user.model.js";
-
+import { sendWelcomeEmail } from "../lib/email.js";
+import logger from "../lib/logger.js";
 import jwt from "jsonwebtoken";
 
 const generateToken = (id) => {
@@ -48,6 +50,13 @@ export const signup = async (req, res) => {
 
     setCookies(res, accessToken, refreshToken);
 
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(email, name).catch(err => {
+      logger.error('Failed to send welcome email', { email, error: err.message });
+    });
+    
+    logger.info('User signed up successfully', { userId: user._id, email });
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -55,20 +64,21 @@ export const signup = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
+    logger.error('Signup error', { error: error.message, stack: error.stack });
     res.status(500).json(error.message);
   }
 };
 
 export const login = async (req, res) => {
   try {
-    console.log("api called");
     const { email, password } = req.body;
+    logger.info(`Login attempt for email: ${email}`);
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
-      console.log("logging in");
       const { accessToken, refreshToken } = generateToken(user._id);
       await storeRefreshToken(user._id, refreshToken);
       setCookies(res, accessToken, refreshToken);
+      logger.info(`User logged in: ${user.name}, id: ${user._id}, email: ${user.email}`);
       res.json({
         _id: user._id,
         name: user.name,
@@ -76,9 +86,11 @@ export const login = async (req, res) => {
         role: user.role,
       });
     } else {
+      logger.warn(`Failed login attempt for email: ${email}`);
       res.status(401).json("Invalid email or password");
     }
   } catch (err) {
+    logger.error(`Error logging in: ${err}`);
     res.status(500).json({ message: `Internal server error,${err}` });
   }
 };
