@@ -8,7 +8,7 @@ import LoadingSpinner from '../components/LoadingSpinner'
 const PeopleBought = () => {
     const [recommendations,setRecommendations]= useState([]);
     const [isLoading,setIsLoading] = useState(true);
-    
+
 
     useEffect(()=>{
         const fetchRecommendations = async()=>{
