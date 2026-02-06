@@ -9,6 +9,8 @@ import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import couponRoutes from "./routes/coupon.route.js";
 import cors from 'cors'
+import morganMiddleware from "./lib/morgan.js";
+import logger from "./lib/logger.js";
 
 
 dotenv.config();
@@ -22,6 +24,8 @@ app.use(cors({
   origin: 'http://localhost:5173', // frontend URL
   credentials: true, // to allow cookies to be sent
 }));
+app.use(morganMiddleware);
+
 
 // Routing
 app.use("/api/auth", authRoutes);
@@ -35,4 +39,5 @@ app.use("/api/analytics",analyticsRoutes)
 app.listen(PORT, () => {
   console.log(`server is started at port ${PORT}`);
   connectDB();
+  logger.info(`Server started on port ${PORT}`);
 });
