@@ -39,8 +39,6 @@ const HomePage = () => {
           <FeaturedProducts featuredProducts={products} />
         )}
       </div>
-      <PurchaseCancelPage />
-      <PurchaseSuccessPage />
     </div>
   );
 };
