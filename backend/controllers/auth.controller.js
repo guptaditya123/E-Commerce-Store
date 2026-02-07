@@ -2,7 +2,6 @@ import logger from "../lib/logger.js";
 import redis  from "../lib/redis.js";
 import User from "../models/user.model.js";
 import { sendWelcomeEmail } from "../lib/email.js";
-import logger from "../lib/logger.js";
 import jwt from "jsonwebtoken";
 
 const generateToken = (id) => {
