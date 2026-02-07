@@ -5,6 +5,7 @@ import axios from "../lib/axios";
 
 export const productStore = create((set)=>({
     products:[],
+    featuredProducts:[],
     loading:false,
 
     setProducts:(products)=>set({products}),
@@ -75,7 +76,7 @@ export const productStore = create((set)=>({
         set({loading:true})
         try {
             const response = await axios.get("/product/featuredProducts")
-            set({products:response.data,loading:false})
+            set({featuredProducts:response.data,loading:false})
         } catch (error) {
             
         }
