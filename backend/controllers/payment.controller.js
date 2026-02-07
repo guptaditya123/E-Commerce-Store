@@ -1,6 +1,7 @@
 
 import {stripe} from "../lib/stripe.js";
-import coupon from "../models/coupon.model.js";
+import Coupon from "../models/coupon.model.js";
+import Order from "../models/order.model.js";
 
 
 export const createCheckoutSession =  async (req, res) => {
@@ -14,58 +15,66 @@ export const createCheckoutSession =  async (req, res) => {
       }
       let totalAmount = 0;
       let lineItems = products.map((product) => {
-        const amount = Math.round(product.price);
+        const amount = Math.round(product.price * 100); // Stripe requires amount in cents
         totalAmount += amount * product.quantity;
 
         return {
           price_data: {
             currency: "usd",
-            product_data: {
+            product_data: { 
               name: product.name,
-              image: [product.image],
+              images: [product.image],
             },
             unit_amount: amount,
           },
+          quantity: product.quantity,
         };
       });
 
-      let coupon = null;
+      let couponToUse = null;
       if (couponCode) {
-        coupon = await coupon.findOne({
+        couponToUse = await Coupon.findOne({
           code: couponCode,
           userId: req.user,
           isActive: true,
         });
 
-        if (coupon) {
+        if (couponToUse) {
           totalAmount -= Math.round(
-            (totalAmount * coupon.discountPercentage) / 100
+            (totalAmount * couponToUse.discountPercentage) / 100
           );
         }
       }
 
-      const session = stripe.checkout.sessions.create({
-        payment_method_routes: ["card"],
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
         line_items: lineItems,
         mode: "payment",
-        success_url: `${process.env.CLIENT_URL}/purchase-success?session_id = {CHECKOUT_SESSION_ID}`,
+        success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
-        discounts: coupon
+        discounts: couponToUse
           ? [
               {
-                coupon: await createStripeCoupon(coupon.discountPercentage),
+                coupon: await createStripeCoupon(couponToUse.discountPercentage),
               },
             ]
           : [],
           metadata:{
             userId:req.user._id.toString(),
-            couponCode:couponCode || ""
+            couponCode:couponCode || "",
+            products: JSON.stringify(
+              products.map((p) => ({
+                id: p._id,
+                quantity: p.quantity,
+                price: p.price,
+              }))
+            ),
           }
       });
       if(totalAmount >= 2000){
         await createNewCoupon(req.user._id.toString());
       }
-      res.status(200).json({id:session.id,totalAmount:totalAmount/100});
+      res.status(200).json({id:session.id, url: session.url, totalAmount:totalAmount/100});
     } catch (error) {
       console.log("Error in createCheckoutSession controller", error.message);
       res.status(500).json({ message: "Server error", error: error.message });
@@ -83,7 +92,7 @@ async function createStripeCoupon(discountPercentage) {
 
 
 async function createNewCoupon(userId){
-    const newCoupon = new coupon({
+    const newCoupon = new Coupon({
         code:"GIFT" + Math.random().toString(36).substring(2,8).toUpperCase(),
         discountPercentage:10,
         expirationDate:new Date(Date.now()+36*24*60*60*1000),
@@ -100,7 +109,7 @@ export const checkoutSuccess = async (req,res) => {
 
     if(session.payment_status === "paid"){
       if(session.metadata.couponCode){
-        await coupon.findOneAndUpdate(
+        await Coupon.findOneAndUpdate(
           {
             code:session.metadata.couponCode,
             userId:session.metadata.userId,
@@ -112,7 +121,7 @@ export const checkoutSuccess = async (req,res) => {
       }
         const products = JSON.parse(session.metadata.products)
         const newOrder= new Order({
-          user:session.metadata.userid,
+          user:session.metadata.userId,
           products:products.map((product)=>({
             product:product.id,
             quantity:product.quantity,
