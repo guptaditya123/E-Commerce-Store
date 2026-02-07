@@ -6,7 +6,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import axios from "../lib/axios";
 
 const stripePromise = loadStripe(
-	"pk_test_51KZYccCoOZF2UhtOwdXQl3vcizup20zqKqT9hVUIsVzsdBrhqbUI2fE0ZdEVLdZfeHjeyFXtqaNsyCJCmZWnjNZa00PzMAjlcL"
+	"pk_test_51RVuSJFpIoAw8AE9P7eUsduRJnVlQJZKQ5CJ1vfzBfVjnqEjj1rubR66DkBB2rYKr04Iqtq8YZQGpvVeQTGIQElK00u7agpnPY"
 );
 
 const OrderSummary = () => {
@@ -18,19 +18,34 @@ const OrderSummary = () => {
 	const formattedSavings = savings.toFixed(2);
 
 	const handlePayment = async () => {
-		const stripe = await stripePromise;
-		const res = await axios.post("/payments/create-checkout-session", {
-			products: cart,
-			couponCode: coupon ? coupon.code : null,
-		});
+		try {
+			const stripe = await stripePromise;
+			
+			if (!stripe) {
+				console.error("Stripe failed to load");
+				alert("Payment system failed to load. Please refresh the page and try again.");
+				return;
+			}
 
-		const session = res.data;
-		const result = await stripe.redirectToCheckout({
-			sessionId: session.id,
-		});
+			console.log("Creating checkout session...");
+			const res = await axios.post("/payment/create-checkout-session", {
+				products: cart,
+				couponCode: coupon ? coupon.code : null,
+			});
 
-		if (result.error) {
-			console.error("Error:", result.error);
+			const session = res.data;
+			console.log("Session created:", session);
+			
+			if (session.url) {
+				console.log("Redirecting to checkout...");
+				window.location.href = session.url;
+			} else {
+				console.error("No checkout URL received");
+				alert("Failed to create checkout session. Please try again.");
+			}
+		} catch (error) {
+			console.error("Payment error:", error);
+			alert("Failed to process payment. Please try again.");
 		}
 	};
 
