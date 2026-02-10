@@ -1,4 +1,4 @@
-
+import coupon from "../models/coupon.model.js";
 
 export const getCoupon = async(req,res)=>{
     try {
@@ -9,6 +9,25 @@ export const getCoupon = async(req,res)=>{
         res.status(200).json(coupon);
 
 
+    } catch (error) {
+        res.status(500).json({message:"Server Error", error:error.message});
+    }
+}
+
+export const createCoupon = async(req,res)=>{
+    try {
+        const {code, discountPercentage, expirationDate} = req.body;
+        const existingCoupon = await coupon.findOne({code:code, userId:req.user._id});
+        if(existingCoupon){
+            return res.status(400).json({message:"You already have a coupon with this code."});
+        }
+        const newCoupon = await coupon.create({
+            userId:req.user._id,
+            code,
+            discountPercentage,
+            expirationDate
+        });
+        res.status(201).json(newCoupon);
     } catch (error) {
         res.status(500).json({message:"Server Error", error:error.message});
     }
