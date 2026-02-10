@@ -36,6 +36,22 @@ export const cartStore = create((set, get) => ({
     toast.success("Coupon Removed");
   },
 
+  couponHandler: async (code) => {
+    try {
+      const response = await axios.post("/coupon/create", {
+        code,
+        discountPercentage: 10, // You can make this dynamic as needed
+      });
+      set({ coupon: response.data, isCouponApplied: true });
+      get().calculateTotals();
+      toast.success("Coupon created and applied successfully"); 
+      
+    }
+      catch (error) {
+        toast.error(error.response?.data?.message || "Failed to apply coupon");
+      }
+  },
+
   getCartItems: async () => {
     try {
       const response = await axios.get("/cart/");
