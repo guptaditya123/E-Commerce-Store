@@ -54,6 +54,16 @@ export const userStore=create((set,get)=>({
         } catch (error) {
             set({checkingAuth:false,user:null});
         }
+    },
+
+    getAllUser: async()=>{
+        try {
+            const res = await axios.get('/auth/allUsers');
+            return res.data;
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred while fetching users")
+            return [];
+        }
     }
 
 
