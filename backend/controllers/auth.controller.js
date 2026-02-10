@@ -154,3 +154,20 @@ export const getProfile = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const getAllUsers=async(req,res)=>{
+  try {
+    console.log(req.user);
+   if(req.user.role !== 'admin'){
+    return res.status(400).json({message:"only admin are allowed."});
+    }
+
+    const allUsers = await User.find().select('name email _id');
+    return res.status(200).json(allUsers);
+
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+
+  }
+}
