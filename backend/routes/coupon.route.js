@@ -6,6 +6,6 @@ const couponRouter = express.Router();
 
 couponRouter.get('/',protectRoute,getCoupon);
 couponRouter.post('/',protectRoute,validateCoupon);
-couponRouter.post('/create',protectRoute,createCoupon);
+couponRouter.post('/create',createCoupon);
 
 export default couponRouter;
