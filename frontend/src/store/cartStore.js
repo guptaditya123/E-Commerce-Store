@@ -36,11 +36,13 @@ export const cartStore = create((set, get) => ({
     toast.success("Coupon Removed");
   },
 
-  couponHandler: async (code) => {
+  couponHandler: async (code,discountPercentage,expirationDate,id) => {
     try {
       const response = await axios.post("/coupon/create", {
         code,
-        discountPercentage: 10, // You can make this dynamic as needed
+        discountPercentage,
+        expirationDate,
+        id
       });
       set({ coupon: response.data, isCouponApplied: true });
       get().calculateTotals();
