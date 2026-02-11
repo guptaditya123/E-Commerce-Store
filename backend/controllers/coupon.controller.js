@@ -14,15 +14,23 @@ export const getCoupon = async(req,res)=>{
     }
 }
 
+const formatDate=(date)=>{
+    const d= new Date(date);
+    const month=d.getMonth()+1;
+    const day=d.getDate();
+    
+
+}
 export const createCoupon = async(req,res)=>{
     try {
-        const {code, discountPercentage, expirationDate} = req.body;
-        const existingCoupon = await coupon.findOne({code:code, userId:req.user._id});
+        const {code, discountPercentage, expirationDate,id} = req.body;
+        const existingCoupon = await coupon.findOne({code:code, userId:id});
         if(existingCoupon){
             return res.status(400).json({message:"You already have a coupon with this code."});
         }
+
         const newCoupon = await coupon.create({
-            userId:req.user._id,
+            userId:id,
             code,
             discountPercentage,
             expirationDate
