@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { userStore } from "./store/userStore";
 import { useEffect, lazy, Suspense } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 // Lazy load page components
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -12,6 +13,8 @@ const Login = lazy(() => import("./pages/Login"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
+const PurchaseSuccessPage = lazy(() => import("./pages/PurchaseSuccessPage"));
+const PurchaseCancelPage = lazy(() => import("./pages/PurchaseCancelPage"));
 
 function App() {
   const { user, logout, checkAuth, checkingAuth } = userStore();
@@ -57,6 +60,10 @@ function App() {
               }
             />
             <Route path='/cart' element={!user ? <Login /> :<CartPage />} />
+
+            <Route path='/purchase-success' element={user? <PurchaseSuccessPage/> : <Navigate to="/login" />} />
+            <Route path='/purchase-cancel' element={user?<PurchaseCancelPage/> : <Navigate to="/login" />} />
+            <Route path='/products/:id' element={<ProductDetailPage />} />
           </Routes>
         </Suspense>
       </div>
