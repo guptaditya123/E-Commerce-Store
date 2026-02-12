@@ -2,6 +2,7 @@
 import {stripe} from "../lib/stripe.js";
 import Coupon from "../models/coupon.model.js";
 import Order from "../models/order.model.js";
+import User from "../models/user.model.js";
 
 
 export const createCheckoutSession =  async (req, res) => {
@@ -131,6 +132,12 @@ export const checkoutSuccess = async (req,res) => {
           stripeSessionId:sessionId,
         });
         await newOrder.save();
+        
+        // Clear user's cart after successful order
+        await User.findByIdAndUpdate(session.metadata.userId, {
+          cartItems: []
+        });
+        
         res.status(200).json({
           success:true,
           message:"Payment successful, order created , and coupon deactivated if used."
