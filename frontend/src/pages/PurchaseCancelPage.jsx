@@ -13,7 +13,7 @@ const PurchaseCancelPage = () => {
       >
         <div className='p-6 sm:p-8'>
           <div className='flex justify-center'>
-            <XCircle className='text-red-500 w-16 h-16 mg-4' />
+            <XCircle className='text-red-500 w-16 h-16 mb-4' />
           </div>
           <h1 className='text-2xl sm:text-3xl font-bold text-center text-red-500 mb-2'>
             Purchase Cancelled
@@ -30,7 +30,7 @@ const PurchaseCancelPage = () => {
           <div className='space-y-4'>
             <Link 
             to='/'
-            className='w-full bg-gray-700 hover text-gray-300 font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center'
+            className='w-full bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center'
             >
               <ArrowLeft className='mr-2' size={18} />
               Return to Shop
