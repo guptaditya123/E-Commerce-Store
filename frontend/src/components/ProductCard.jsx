@@ -1,9 +1,9 @@
 import React from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ChevronsUpDown } from "lucide-react";
 import { userStore } from "../store/userStore";
 import {toast} from "react-hot-toast";
 import { cartStore } from "../store/cartStore";
-
+import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   const { user } = userStore();
@@ -46,14 +46,20 @@ const ProductCard = ({ product }) => {
             </span>
           </p>
         </div>
+          <div className="flex items-center gap-3">
         <button
-          className="flex items-center justify-center rounded-lg bg-emerald-600 px-5 py-2.5 text-center text-sm font-medium
-					 text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+          className="flex-1 flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2.5 text-center text-sm font-medium
+					 text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition-colors"
           onClick={handleAddToCart}
         >
-          <ShoppingCart size={22} className="mr-2" />
+          <ShoppingCart size={20} className="mr-2" />
           Add to cart
         </button>
+        <Link to={`/products/${product._id}`} className="flex-1 flex items-center justify-center rounded-lg border border-emerald-600 px-4 py-2.5 text-center text-sm font-medium text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors focus:outline-none focus:ring-4 focus:ring-emerald-300">
+          <ChevronsUpDown size={20} className="mr-2" />
+          View Details
+        </Link>
+          </div>
       </div>
     </div>
   );
