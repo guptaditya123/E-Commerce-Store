@@ -4,7 +4,7 @@ import { createCoupon, getCoupon, validateCoupon } from '../controllers/coupon.c
 
 const couponRouter = express.Router();
 
-couponRouter.get('/',protectRoute,getCoupon);
+couponRouter.get('/',getCoupon);
 couponRouter.post('/',protectRoute,validateCoupon);
 couponRouter.post('/create',createCoupon);
 
