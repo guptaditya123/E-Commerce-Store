@@ -1,5 +1,6 @@
 import Product from "../models/product.model.js";
 
+
 export const addCart = async (req, res) => {
     try {
         const { productId } = req.body;
@@ -24,7 +25,7 @@ export const addCart = async (req, res) => {
 
 export const removeAllFromCart = async(req,res)=>{
     try {
-        const {productId} = req.body;
+        const {productId} = req.body || {};
         const user = req.user;
         if(!productId){
             user.cartItems = [];
