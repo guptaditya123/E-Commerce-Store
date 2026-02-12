@@ -36,14 +36,9 @@ export const cartStore = create((set, get) => ({
     toast.success("Coupon Removed");
   },
 
-  couponHandler: async (code,discountPercentage,expirationDate,id) => {
+  couponHandler: async (couponData) => {
     try {
-      const response = await axios.post("/coupon/create", {
-        code,
-        discountPercentage,
-        expirationDate,
-        id
-      });
+      const response = await axios.post("/coupon/create", couponData);
       set({ coupon: response.data, isCouponApplied: true });
       get().calculateTotals();
       toast.success("Coupon created and applied successfully"); 
@@ -105,7 +100,12 @@ export const cartStore = create((set, get) => ({
   },
 
   clearCart:async()=>{
-    set({cart:[],coupon:null,total:0,subtotal:0});
+    try{
+      await axios.delete('/cart/remove');
+      set({cart:[],coupon:null,total:0,subtotal:0,isCouponApplied:false});
+    }catch(error){
+      toast.error(error.response.data.message || "An error occurred");
+    }
   },
   calculateTotals: () => {
     const { cart, coupon } = get();
