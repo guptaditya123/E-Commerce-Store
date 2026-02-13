@@ -70,7 +70,7 @@ const ProductList = () => {
 								<button
 									onClick={() => toggleFeaturedProduct(product._id)}
 									className={`p-1 rounded-full ${
-										product.featured ? "bg-yellow-400 text-gray-900" : "bg-gray-600 text-gray-300"
+										product.isFeatured ? "bg-yellow-400 text-gray-900" : "bg-gray-600 text-gray-300"
 									} hover:bg-yellow-500 transition-colors duration-200`}
 								>
 									<Star className='h-5 w-5' />
