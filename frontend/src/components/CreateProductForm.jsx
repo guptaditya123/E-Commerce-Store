@@ -19,6 +19,7 @@ const CreateProductForm = () => {
     description: "",
     price: "",
     category: "",
+    stock: "",
     image: "",
   });
   const [loading, setLoading] = useState(false);
@@ -145,6 +146,26 @@ const CreateProductForm = () => {
               </option>
             ))}
           </select>
+        </div>
+        
+        <div>
+          <label
+            htmlFor="stock"
+            className="block text-sm font-medium text-gray-300"
+          >
+            Stock
+          </label>
+          <input
+            id="stock"
+            name="stock"
+            value={newProduct.stock}
+            onChange={(e) =>
+              setNewProduct({ ...newProduct, stock: e.target.value })
+            }
+            type="number"
+            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            required
+          />
         </div>
 
         <div className="mt-1 flex items-center">
