@@ -7,14 +7,12 @@ import { userStore } from '../store/userStore';
 import { motion } from 'framer-motion';
 import { ShoppingCart, ArrowLeft, Star } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
-import toast from 'react-hot-toast';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { getProductById, loading } = productStore();
     const { addToCart } = cartStore();
-    const { user } = userStore();
     const [product, setProduct] = useState(null);
     const [selectedImage, setSelectedImage] = useState(0);
     
@@ -30,14 +28,6 @@ const ProductDetailPage = () => {
         fetchProduct();
     }, [id, getProductById]);
 
-    const handleAddToCart = () => {
-        if (!user) {
-            toast.error("Please login to add items to cart");
-            navigate('/login');
-            return;
-        }
-        addToCart(product);
-    };
 
     if (loading || !product) {
         return <LoadingSpinner />;
@@ -150,7 +140,7 @@ const ProductDetailPage = () => {
 
                             {/* Add to Cart Button */}
                             <motion.button
-                                onClick={handleAddToCart}
+                                onClick={() => addToCart(product)}
                                 className='w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-4 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition-colors'
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
