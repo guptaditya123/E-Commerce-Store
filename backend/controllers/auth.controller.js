@@ -113,7 +113,7 @@ export const logout = async (req, res) => {
 // this is to refresh the access token
 export const refreshToken = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
       return res.status(401).json({ message: "No refresh token provided" });
@@ -127,7 +127,7 @@ export const refreshToken = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { userId: decoded.id },
+      { id: decoded.id },
       process.env.ACCESS_TOKEN_KEY,
       { expiresIn: "15m" }
     );
@@ -141,7 +141,8 @@ export const refreshToken = async (req, res) => {
 
     return res.json({ message: "Token Refreshed Successfully." });
   } catch (err) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.log("Error in refreshToken:", err.message);
+    return res.status(401).json({ message: "Invalid refresh token" });
   }
 };
 
