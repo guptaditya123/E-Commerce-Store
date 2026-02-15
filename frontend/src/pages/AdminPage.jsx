@@ -1,53 +1,43 @@
-import { BarChart, PlusCircle, ShoppingBasket, User } from "lucide-react";
 import React, { useState } from "react";
 import CreateProductForm from "../components/CreateProductForm";
 import ProductList from "../components/ProductList";
 import AnalyticsTab from "../components/AnalyticsTab";
 import { motion } from "framer-motion";
 import CustomerList from "../components/CustomerList";
+import AdminLayout from "../components/AdminLayout";
 
-const tabs = [
-  { id: "create", label: "Create Product", icon: PlusCircle },
-  { id: "products", label: "Products", icon: ShoppingBasket },
-  { id: "analytics", label: "Analytics", icon: BarChart },
-  { id: "customers", label: "Customers", icon: User },
-];
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState("create");
+
   return (
-    <div>
-      <div>
+    <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Page Title */}
         <motion.h1
-          className="text-4xl font-bold mb-4 mt-6 text-emerald-400 text-center"
+          className="text-4xl font-bold mb-8 text-emerald-400"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Admin Dashboard
+          {activeTab === "create" && "Create New Product"}
+          {activeTab === "products" && "Manage Products"}
+          {activeTab === "analytics" && "Analytics Dashboard"}
+          {activeTab === "customers" && "Customer Management"}
         </motion.h1>
 
-        <div className="flex justify-center mb-8">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center px-4 py-2 mx-2 rounded-md transition-colors duration-200 ${
-                activeTab === tab.id
-                  ? "bg-emerald-600 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
-            >
-              <tab.icon className="mr-2 h-5 w-5" />
-              {tab.label}
-            </button>
-          ))}
+        {/* Content based on active tab */}
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6">
+          {activeTab === "create" && <CreateProductForm />}
+          {activeTab === "products" && <ProductList />}
+          {activeTab === "analytics" && <AnalyticsTab />}
+          {activeTab === "customers" && <CustomerList />}
         </div>
-        {activeTab === "create" && <CreateProductForm />}
-        {activeTab === "products" && <ProductList />}
-        {activeTab === "analytics" && <AnalyticsTab />}
-        {activeTab === "customers" && <CustomerList />}
-      </div>
-    </div>
+      </motion.div>
+    </AdminLayout>
   );
 };
 
