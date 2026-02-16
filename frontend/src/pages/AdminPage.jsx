@@ -17,17 +17,6 @@ const AdminPage = () => {
         transition={{ duration: 0.5 }}
       >
         {/* Page Title */}
-        <motion.h1
-          className="text-4xl font-bold mb-8 text-emerald-400"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {activeTab === "create" && "Create New Product"}
-          {activeTab === "products" && "Manage Products"}
-          {activeTab === "analytics" && "Analytics Dashboard"}
-          {activeTab === "customers" && "Customer Management"}
-        </motion.h1>
 
         {/* Content based on active tab */}
         <div className="bg-gray-800 rounded-lg shadow-xl p-6">
