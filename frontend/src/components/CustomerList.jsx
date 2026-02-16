@@ -2,10 +2,11 @@ import React from "react";
 import { userStore } from "../store/userStore";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Ticket, X } from "lucide-react";
+import { Search, Ticket, X } from "lucide-react";
 import { cartStore } from "../store/cartStore";
 import LoadingSpinner from "./LoadingSpinner";
 import toast from "react-hot-toast";
+
 
 const CustomerList = () => {
   const [customer, setCustomer] = useState([]);
@@ -15,7 +16,7 @@ const CustomerList = () => {
   const [coupon, setCoupon] = useState(null);
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [expirationDate, setExpirationDate] = useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
   const { getAllUser } = userStore();
   const { couponHandler } = cartStore();
 
@@ -38,6 +39,11 @@ const submitHandler = () => {
     toast.error( error.response?.data?.message || "An error occurred");
   }}
 
+  const handleSearch=(e)=>{
+    e.preventDefault();
+    
+  }
+
   useEffect(() => {
     setLoading(true);
     getAllUser()
@@ -50,19 +56,25 @@ const submitHandler = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-800 rounded-lg shadow-md flex flex-col items-center w-[80%] mx-auto">
+    <div className="p-6 bg-gray-800 rounded-lg shadow-md flex flex-col w-[80%] mx-auto">
+      <div  className="flex items-center mb-4 gap-4 justify-between">
       <h2 className="text-2xl font-bold mb-4 text-emerald-400">
         Customer List
       </h2>
-      <p className="text-gray-300">
-        This is where the customer list will be displayed.
-      </p>
+      <form onSubmit={handleSearch} className="flex justify-between w-2/3 border border-gray-700 rounded-md px-3 py-2 cursor-pointer hover:border-emerald-500 transition-colors">
+        <input type="text" 
+        className="outline-none"
+        placeholder="Search customers..."
+        onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <Search size={20} className="text-gray-400 hover:text-emerald-400 cursor-pointer" />
+        </form>
+      </div>
 
       {/* create a table to display customers with name, email and role */}
       <table className="w-full text-left mt-4">
         <thead>
           <tr>
-            <th className="border-b border-gray-700 py-2">Id</th>
             <th className="border-b border-gray-700 py-2">Name</th>
             <th className="border-b border-gray-700 py-2">Email</th>
             <th className="border-b border-gray-700 py-2">Create Coupon</th>
@@ -71,7 +83,6 @@ const submitHandler = () => {
         <tbody>
           {customer.map((cust) => (
             <tr key={cust._id}>
-              <td className="border-b border-gray-700 py-2">{cust._id}</td>
               <td className="border-b border-gray-700 py-2">{cust.name}</td>
               <td className="border-b border-gray-700 py-2">{cust.email}</td>
               <td className="border-b border-gray-700 py-2">
