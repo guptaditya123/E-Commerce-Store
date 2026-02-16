@@ -163,7 +163,7 @@ export const getAllUsers=async(req,res)=>{
     return res.status(400).json({message:"only admin are allowed."});
     }
 
-    const allUsers = await User.find().select('name email _id');
+    const allUsers = await User.find().select('name email _id cartItems');
     return res.status(200).json(allUsers);
 
 
