@@ -172,3 +172,19 @@ export const getAllUsers=async(req,res)=>{
 
   }
 }
+
+export const searchUsers=async(req,res)=>{
+  try {
+    const { query } = req.body;
+    if(req.user.role !== 'admin'){
+      return res.status(400).json({message:"only admin are allowed."});
+      }
+
+    const allUsers = await User.find({$or:[{name:{$regex:query,$options:"i"}},{email:{$regex:query,$options:"i"}}]}).select('name email _id cartItems');
+    return res.status(200).json(allUsers);
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" }); 
+
+  } 
+} 
