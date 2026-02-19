@@ -6,6 +6,7 @@ import { Search, Ticket, X } from "lucide-react";
 import { cartStore } from "../store/cartStore";
 import LoadingSpinner from "./LoadingSpinner";
 import toast from "react-hot-toast";
+import axios from "../lib/axios";
 
 
 const CustomerList = () => {
@@ -39,9 +40,19 @@ const submitHandler = () => {
     toast.error( error.response?.data?.message || "An error occurred");
   }}
 
-  const handleSearch=(e)=>{
+  const handleSearch=async(e)=>{
     e.preventDefault();
-    
+    console.log(searchTerm);
+    if(searchTerm.trim()===""){
+      return ;
+    }
+    try{
+      const res = await axios.post("/auth/search", { query: searchTerm });
+      setCustomer(res.data);
+    }catch(error){
+      console.error("Error searching customers:", error);
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
   }
 
   useEffect(() => {
