@@ -44,6 +44,11 @@ const submitHandler = () => {
     e.preventDefault();
     console.log(searchTerm);
     if(searchTerm.trim()===""){
+      // If search is empty, show all users
+      setLoading(true);
+      getAllUser()
+        .then((data) => setCustomer(data))
+        .finally(() => setLoading(false));
       return ;
     }
     try{
@@ -52,6 +57,19 @@ const submitHandler = () => {
     }catch(error){
       console.error("Error searching customers:", error);
       toast.error(error.response?.data?.message || "An error occurred");
+    }
+  }
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // If input is cleared, immediately show all users
+    if (value.trim() === "") {
+      setLoading(true);
+      getAllUser()
+        .then((data) => setCustomer(data))
+        .finally(() => setLoading(false));
     }
   }
 
@@ -76,7 +94,8 @@ const submitHandler = () => {
         <input type="text" 
         className="outline-none"
         placeholder="Search customers..."
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={searchTerm}
+        onChange={handleInputChange}
         />
         <Search size={20} className="text-gray-400 hover:text-emerald-400 cursor-pointer" />
         </form>
@@ -203,7 +222,7 @@ const submitHandler = () => {
             </div>
           )}
         </tbody>
-      </table>
+      </table>k
     </div>
   );
 };
