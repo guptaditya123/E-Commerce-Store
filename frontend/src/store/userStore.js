@@ -56,13 +56,13 @@ export const userStore=create((set,get)=>({
         }
     },
 
-    getAllUser: async()=>{
+    getAllUser: async(page = 1, limit = 10)=>{
         try {
-            const res = await axios.get('/auth/allUsers');
+            const res = await axios.get(`/auth/allUsers?page=${page}&limit=${limit}`);
             return res.data;
         } catch (error) {
             toast.error(error.response?.data?.message || "An error occurred while fetching users")
-            return [];
+            return { users: [], pagination: {} };
         }
     }
 
