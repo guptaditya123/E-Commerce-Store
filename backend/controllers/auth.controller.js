@@ -163,9 +163,32 @@ export const getAllUsers=async(req,res)=>{
     return res.status(400).json({message:"only admin are allowed."});
     }
 
-    const allUsers = await User.find().select('name email _id cartItems');
-    return res.status(200).json(allUsers);
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
+    // Get total count for pagination metadata
+    const totalUsers = await User.countDocuments();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    // Get paginated users
+    const allUsers = await User.find()
+      .select('name email _id cartItems')
+      .skip(skip)
+      .limit(limit);
+
+    return res.status(200).json({
+      users: allUsers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalUsers,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
@@ -180,8 +203,34 @@ export const searchUsers=async(req,res)=>{
       return res.status(400).json({message:"only admin are allowed."});
       }
 
-    const allUsers = await User.find({$or:[{name:{$regex:query,$options:"i"}},{email:{$regex:query,$options:"i"}}]}).select('name email _id cartItems');
-    return res.status(200).json(allUsers);
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const searchQuery = {$or:[{name:{$regex:query,$options:"i"}},{email:{$regex:query,$options:"i"}}]};
+
+    // Get total count for pagination metadata
+    const totalUsers = await User.countDocuments(searchQuery);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    // Get paginated search results
+    const allUsers = await User.find(searchQuery)
+      .select('name email _id cartItems')
+      .skip(skip)
+      .limit(limit);
+
+    return res.status(200).json({
+      users: allUsers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalUsers,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" }); 
