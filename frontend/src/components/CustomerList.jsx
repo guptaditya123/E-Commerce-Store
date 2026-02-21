@@ -124,6 +124,11 @@ const CustomerList = () => {
     }
   };
 
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    fetchUsers(1);
+  };
+
   useEffect(() => {
     fetchUsers(1);
   }, []);
@@ -140,19 +145,29 @@ const CustomerList = () => {
         </h2>
         <form
           onSubmit={handleSearch}
-          className="flex justify-between w-2/3 border border-gray-700 rounded-md px-3 py-2 cursor-pointer hover:border-emerald-500 transition-colors"
+          className="flex items-center justify-between w-2/3 border border-gray-700 rounded-md px-3 py-2 cursor-pointer hover:border-emerald-500 transition-colors"
         >
           <input
             type="text"
-            className="outline-none"
+            className="outline-none flex-1 bg-transparent text-white"
             placeholder="Search customers..."
             value={searchTerm}
             onChange={handleInputChange}
           />
-          <Search
-            size={20}
-            className="text-gray-400 hover:text-emerald-400 cursor-pointer"
-          />
+          <div className="flex items-center gap-2">
+            {searchTerm && (
+              <X
+                size={20}
+                className="text-gray-400 hover:text-red-400 cursor-pointer transition-colors"
+                onClick={handleClearSearch}
+              />
+            )}
+            <Search
+              size={20}
+              className="text-gray-400 hover:text-emerald-400 cursor-pointer"
+              onClick={handleSearch}
+            />
+          </div>
         </form>
       </div>
       {/* create a table to display customers with name, email and role */}
