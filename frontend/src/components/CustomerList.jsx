@@ -8,7 +8,6 @@ import LoadingSpinner from "./LoadingSpinner";
 import toast from "react-hot-toast";
 import axios from "../lib/axios";
 
-
 const CustomerList = () => {
   const [customer, setCustomer] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -18,66 +17,115 @@ const CustomerList = () => {
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [expirationDate, setExpirationDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalUsers: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
   const { getAllUser } = userStore();
   const { couponHandler } = cartStore();
 
-const submitHandler = () => {
- try{
-    if (!coupon || !discountPercentage || !expirationDate) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-  let couponData= {
-    code: coupon.trim(),
-    id: selectedUser._id,
-    discountPercentage: parseFloat(discountPercentage),
-    expirationDate: new Date(expirationDate).toISOString(),
-  }
-  console.log("Submitting coupon data:", couponData);
-    couponHandler(couponData);
-  } catch (error) {
-    console.error("Error submitting coupon:", error);
-    toast.error( error.response?.data?.message || "An error occurred");
-  }}
-
-  const handleSearch=async(e)=>{
-    e.preventDefault();
-    console.log(searchTerm);
-    if(searchTerm.trim()===""){
-      // If search is empty, show all users
-      setLoading(true);
-      getAllUser()
-        .then((data) => setCustomer(data))
-        .finally(() => setLoading(false));
-      return ;
+  // Fetch users with pagination
+  const fetchUsers = async (page = 1) => {
+    setLoading(true);
+    try {
+      const data = await getAllUser(page, itemsPerPage);
+      setCustomer(data.users || []);
+      setPagination(data.pagination || {});
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
     }
-    try{
-      const res = await axios.post("/auth/search", { query: searchTerm });
-      setCustomer(res.data);
-    }catch(error){
-      console.error("Error searching customers:", error);
+  };
+
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (pagination.hasNextPage) {
+      if (searchTerm.trim()) {
+        handleSearch(null, currentPage + 1);
+      } else {
+        fetchUsers(currentPage + 1);
+      }
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (pagination.hasPrevPage) {
+      if (searchTerm.trim()) {
+        handleSearch(null, currentPage - 1);
+      } else {
+        fetchUsers(currentPage - 1);
+      }
+    }
+  };
+
+  const handlePageClick = (pageNumber) => {
+    if (searchTerm.trim()) {
+      handleSearch(null, pageNumber);
+    } else {
+      fetchUsers(pageNumber);
+    }
+  };
+
+  const submitHandler = () => {
+    try {
+      if (!coupon || !discountPercentage || !expirationDate) {
+        toast.error("Please fill in all fields");
+        return;
+      }
+      let couponData = {
+        code: coupon.trim(),
+        id: selectedUser._id,
+        discountPercentage: parseFloat(discountPercentage),
+        expirationDate: new Date(expirationDate).toISOString(),
+      };
+      console.log("Submitting coupon data:", couponData);
+      couponHandler(couponData);
+    } catch (error) {
+      console.error("Error submitting coupon:", error);
       toast.error(error.response?.data?.message || "An error occurred");
     }
-  }
+  };
+
+  const handleSearch = async (e, page = 1) => {
+    if (e) e.preventDefault();
+    console.log(searchTerm);
+    if (searchTerm.trim() === "") {
+      // If search is empty, show all users
+      fetchUsers(page);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.post(`/auth/search?page=${page}&limit=${itemsPerPage}`, { query: searchTerm });
+      setCustomer(res.data.users || []);
+      setPagination(res.data.pagination || {});
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("Error searching customers:", error);
+      toast.error(error.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    
+
     // If input is cleared, immediately show all users
     if (value.trim() === "") {
-      setLoading(true);
-      getAllUser()
-        .then((data) => setCustomer(data))
-        .finally(() => setLoading(false));
+      fetchUsers(1);
     }
-  }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    getAllUser()
-      .then((data) => setCustomer(data))
-      .finally(() => setLoading(false));
+    fetchUsers(1);
   }, []);
 
   if (loading) {
@@ -86,21 +134,27 @@ const submitHandler = () => {
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-md flex flex-col w-[80%] mx-auto">
-      <div  className="flex items-center mb-4 gap-4 justify-between">
-      <h2 className="text-2xl font-bold mb-4 text-emerald-400">
-        Customer List
-      </h2>
-      <form onSubmit={handleSearch} className="flex justify-between w-2/3 border border-gray-700 rounded-md px-3 py-2 cursor-pointer hover:border-emerald-500 transition-colors">
-        <input type="text" 
-        className="outline-none"
-        placeholder="Search customers..."
-        value={searchTerm}
-        onChange={handleInputChange}
-        />
-        <Search size={20} className="text-gray-400 hover:text-emerald-400 cursor-pointer" />
+      <div className="flex items-center mb-4 gap-4 justify-between">
+        <h2 className="text-2xl font-bold mb-4 text-emerald-400">
+          Customer List
+        </h2>
+        <form
+          onSubmit={handleSearch}
+          className="flex justify-between w-2/3 border border-gray-700 rounded-md px-3 py-2 cursor-pointer hover:border-emerald-500 transition-colors"
+        >
+          <input
+            type="text"
+            className="outline-none"
+            placeholder="Search customers..."
+            value={searchTerm}
+            onChange={handleInputChange}
+          />
+          <Search
+            size={20}
+            className="text-gray-400 hover:text-emerald-400 cursor-pointer"
+          />
         </form>
       </div>
-
       {/* create a table to display customers with name, email and role */}
       <table className="w-full text-left mt-4">
         <thead>
@@ -222,7 +276,58 @@ const submitHandler = () => {
             </div>
           )}
         </tbody>
-      </table>k
+      </table>
+      {customer.length > 0 && (
+        <div className="flex justify-center items-center p-4 gap-2">
+          <button
+            onClick={handlePrevPage}
+            disabled={!pagination.hasPrevPage}
+            className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              !pagination.hasPrevPage
+                ? "text-gray-500 cursor-not-allowed"
+                : "text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer"
+            }`}
+          >
+            Prev
+          </button>
+
+          <div className="flex gap-2">
+            {[...Array(pagination.totalPages || 1)].map((_, index) => {
+              const pageNumber = index + 1;
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageClick(pageNumber)}
+                  className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    currentPage === pageNumber
+                      ? "bg-emerald-600 text-white"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700"
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={handleNextPage}
+            disabled={!pagination.hasNextPage}
+            className={`px-4 py-2 rounded-md font-medium transition-colors ${
+              !pagination.hasNextPage
+                ? "text-gray-500 cursor-not-allowed"
+                : "text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
+      {customer.length === 0 && !loading && (
+        <div className="text-center py-8 text-gray-400">
+          No customers found
+        </div>
+      )}
     </div>
   );
 };
