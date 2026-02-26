@@ -237,3 +237,46 @@ export const searchUsers=async(req,res)=>{
 
   } 
 } 
+
+
+export const exportUsersToExcel=async(req,res)=>{
+  try {
+    const data = await User.find({}).select("_id name email");
+    if(!data.length){
+      return res.status(404).json({message:"No users found."})
+    }
+    
+    // CSV helper function to escape values properly
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '""';
+      const stringValue = String(value);
+      // If value contains comma, quote, or newline, wrap in quotes and escape existing quotes
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return `"${stringValue}"`;
+    };
+
+    const header = ["ID", "Name", "Email"];
+    const fields = ["_id", "name", "email"];
+    const rows = data.map(user => 
+      fields.map(field => escapeCSV(user[field])).join(",")
+    );
+
+    const csv = [
+      header.map(h => escapeCSV(h)).join(","),
+      ...rows
+    ].join("\n");
+
+    // set download headers
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=users.csv"
+    );
+    res.status(200).send(csv);
+  } catch (error) {
+    logger.error("Error exporting users to Excel:", error);
+    res.status(500).json({message:"Internal server error", error: error.message});
+  }
+}
