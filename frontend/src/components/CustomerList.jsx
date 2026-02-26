@@ -23,7 +23,7 @@ const CustomerList = () => {
     totalPages: 1,
     totalUsers: 0,
     hasNextPage: false,
-    hasPrevPage: false
+    hasPrevPage: false,
   });
   const { getAllUser } = userStore();
   const { couponHandler } = cartStore();
@@ -42,6 +42,31 @@ const CustomerList = () => {
       setLoading(false);
     }
   };
+
+  // Export to Excel handler
+  const handleExportToExcel = async () => {
+    try {
+      toast.loading("Exporting users...");
+      const response = await axios.get('/auth/exportUsers', { responseType: "blob" });
+      
+      const blob = new Blob([response.data], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "users.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.dismiss();
+      toast.success("Users exported successfully!");
+    } catch (error) {
+      toast.dismiss();
+      console.error("Error exporting users:", error);
+      toast.error(error.response?.data?.message || "Failed to export users");
+    }
+  }
 
   // Pagination handlers
   const handleNextPage = () => {
@@ -102,7 +127,10 @@ const CustomerList = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post(`/auth/search?page=${page}&limit=${itemsPerPage}`, { query: searchTerm });
+      const res = await axios.post(
+        `/auth/search?page=${page}&limit=${itemsPerPage}`,
+        { query: searchTerm },
+      );
       setCustomer(res.data.users || []);
       setPagination(res.data.pagination || {});
       setCurrentPage(page);
@@ -290,8 +318,20 @@ const CustomerList = () => {
               </div>
             </div>
           )}
+          
         </tbody>
+        
       </table>
+      {
+        <div className="p-4 flex justify-end ">
+            <button className="px-4 py-2 cursor-pointer bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors font-medium"
+            onClick={handleExportToExcel}
+            >
+              Export to Excel
+            </button>
+          </div>
+      }
+
       {customer.length > 0 && (
         <div className="flex justify-center items-center p-4 gap-2">
           <button
@@ -339,10 +379,8 @@ const CustomerList = () => {
         </div>
       )}
       {customer.length === 0 && !loading && (
-        <div className="text-center py-8 text-gray-400">
-          No customers found
-        </div>
-      )}  
+        <div className="text-center py-8 text-gray-400">No customers found</div>
+      )}
     </div>
   );
 };
