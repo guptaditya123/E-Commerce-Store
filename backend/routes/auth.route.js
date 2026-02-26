@@ -1,6 +1,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { signup, login, logout , refreshToken, getProfile, getAllUsers, searchUsers} from "../controllers/auth.controller.js";
+import { signup, login, logout , refreshToken, getProfile, getAllUsers, searchUsers,exportUsersToExcel} from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
@@ -17,5 +17,7 @@ router.get("/profile",protectRoute, getProfile);
 router.get('/allUsers',protectRoute,getAllUsers)
 
 router.post('/search',protectRoute,searchUsers);
+
+router.get('/exportUsers',exportUsersToExcel);
 
 export default router;
